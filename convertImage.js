@@ -12,7 +12,15 @@ function ConvertImage(opts){
 	this.ctx = null;
 	this.canvas = this.createCanvas();  
 }
-
+ConvertImage.prototype.Util = {
+	clone: function(pixels){
+		var tempPixels = [];
+		for(var i=0;i<pixels.length;i++){
+			tempPixels[i] = pixels[i];
+		}
+		return tempPixels;
+	}
+}
 ConvertImage.prototype.createCanvas = function(){
 	var canvas = document.createElement("canvas");
 	canvas.height =	this.opts.height; 
@@ -43,10 +51,10 @@ ConvertImage.prototype.getAdjacencyMatrix = function(x,y,radius,pixels){
 			}
 			var pos = (i*this.opts.width + j)*4;
 			var pixel = {};
-			pixel.r = pixels[pos].r;
-			pixel.g = pixels[pos+1].g;
-			pixel.b = pixels[pos+2].b;
-			pixel.a = pixels[pos+3].a;
+			pixel.r = pixels[pos];
+			pixel.g = pixels[pos+1];
+			pixel.b = pixels[pos+2];
+			pixel.a = pixels[pos+3];
 			this.ajcMatrix.push(pixel);
 		}
 	}
@@ -141,9 +149,12 @@ ConvertImage.prototype.getRelief = function(radius){
 	this.drawImage();
 	var imageData = this.ctx.getImageData(0,0,this.opts.width,this.opts.height);
 	var pixels = imageData.data;	
+	var tempPixels = this.Util.clone(pixels);
+	var ajcmatrTotPix = (radius*2+1)*(radius*2+1)-1;
+	console.log(ajcmatrTotPix);
 	for(var y=0;y<this.opts.height;y++){
 		for(var x=0;x<this.opts.width;x++){
-			this.getAdjacencyMatrix(x,y,radius,pixels);
+			this.getAdjacencyMatrix(x,y,radius,tempPixels);
 			var r=g=b=0;
 			var pixel = "";
 			for(var i=0;i<this.ajcMatrix.length;i++){
@@ -157,11 +168,12 @@ ConvertImage.prototype.getRelief = function(radius){
 				g += this.ajcMatrix[i].g;
 				b += this.ajcMatrix[i].b;
 			}
-			pixel.r = pixel.r - r + 128;
-			pixel.g = pixel.g - g + 128;
-			pixel.b = pixel.b - b + 128;
-			//pixel.r=pixel.g=pixel.b = pixel.r*0.3 + pixel.g*0.59 + pixel.b*0.11;
-			this.setRGBA(x,y,pixel,pixels);
+			var tempPixel = {};
+			tempPixel.r = pixel.r - r/ajcmatrTotPix + 128;
+			tempPixel.g = pixel.g - g/ajcmatrTotPix + 128;
+			tempPixel.b = pixel.b - b/ajcmatrTotPix + 128;
+			tempPixel.r=tempPixel.g=tempPixel.b = tempPixel.r*0.3 + tempPixel.g*0.59 + tempPixel.b*0.11;
+			this.setRGBA(x,y,tempPixel,pixels);
 		}
 	}
 	this.ctx.putImageData(imageData,0,0);
