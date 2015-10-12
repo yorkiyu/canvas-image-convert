@@ -151,14 +151,13 @@ ConvertImage.prototype.getRelief = function(radius){
 	var pixels = imageData.data;	
 	var tempPixels = this.Util.clone(pixels);
 	var ajcmatrTotPix = (radius*2+1)*(radius*2+1)-1;
-	console.log(ajcmatrTotPix);
 	for(var y=0;y<this.opts.height;y++){
 		for(var x=0;x<this.opts.width;x++){
 			this.getAdjacencyMatrix(x,y,radius,tempPixels);
 			var r=g=b=0;
 			var pixel = "";
 			for(var i=0;i<this.ajcMatrix.length;i++){
-				if(!this.ajcMatrix){
+				if(!this.ajcMatrix[i]){
 					continue;
 				}
 				if(i==(this.ajcMatrix.length-1)/2+1){
@@ -172,13 +171,93 @@ ConvertImage.prototype.getRelief = function(radius){
 			tempPixel.r = pixel.r - r/ajcmatrTotPix + 128;
 			tempPixel.g = pixel.g - g/ajcmatrTotPix + 128;
 			tempPixel.b = pixel.b - b/ajcmatrTotPix + 128;
+
+			tempPixel.r = Math.min(255,Math.max(tempPixel.r,0));
+			tempPixel.g = Math.min(255,Math.max(tempPixel.g,0));
+			tempPixel.b = Math.min(255,Math.max(tempPixel.b,0));
+
 			tempPixel.r=tempPixel.g=tempPixel.b = tempPixel.r*0.3 + tempPixel.g*0.59 + tempPixel.b*0.11;
 			this.setRGBA(x,y,tempPixel,pixels);
 		}
 	}
+	delete tempPixels;
 	this.ctx.putImageData(imageData,0,0);
 	var base64data = this.canvas.toDataURL();
 	return base64data;
 }
+
+/***
+	 锐化
+	 算法：突出显示颜色值大(即形成形体边缘)的像素点.
+		g = f + c*laplacian 
+	 g是输出，f为原始图像，c是系数，也就是要加上多少细节的多少
+     
+     @params laplacian laplacian width format:
+     [   
+         -1,-1,-1,
+         -1,9,-1,
+         -1,-1,-1
+     ]
+	 @params radius is laplacian matrix'radius
+	 @params ratio is c in up 
+***/
+
+ConvertImage.prototype.getGsharpen = function(laplacian,ratio,radius){
+	laplacian = laplacian || [-1,-1,-1,-1,9,-1,-1,-1,-1];
+	radius = radius || 1;
+	ratio = ratio || 0.5;
+	this.drawImage();
+	var imageData = this.ctx.getImageData(0,0,this.opts.width,this.opts.height);
+	var pixels = imageData.data;	
+	var tempPixels = this.Util.clone(pixels);
+	for(var y=0;y<this.opts.height;y++){
+		for(var x=0;x<this.opts.width;x++){
+			this.getAdjacencyMatrix(x,y,radius,tempPixels);
+			var r=g=b=0;
+			var pixel = "";
+			for(var i=0;i<this.ajcMatrix.length;i++){
+				if(!this.ajcMatrix[i]) {
+					continue;
+				}
+				if(i==(this.ajcMatrix.length-1)/2+1){
+					pixel = this.ajcMatrix[i];
+				}
+				r += this.ajcMatrix[i].r * laplacian[i];
+				g += this.ajcMatrix[i].g * laplacian[i];
+				b += this.ajcMatrix[i].b * laplacian[i];
+			}
+			var tempPixel = {};
+			tempPixel.r = pixel.r + r * ratio;
+			tempPixel.g = pixel.g + g * ratio;
+			tempPixel.b = pixel.b + b * ratio;
+
+			tempPixel.r = Math.min(255,Math.max(tempPixel.r,0));
+			tempPixel.g = Math.min(255,Math.max(tempPixel.g,0));
+			tempPixel.b = Math.min(255,Math.max(tempPixel.b,0));
+
+			this.setRGBA(x,y,tempPixel,pixels);
+		}
+	}
+	delete tempPixels;
+	this.ctx.putImageData(imageData,0,0);
+	var base64data = this.canvas.toDataURL();
+	return base64data;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

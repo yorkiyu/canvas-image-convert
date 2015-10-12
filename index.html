@@ -30,12 +30,12 @@
 	<script	type="text/javascript" src="convertImage.js?v=2015"></script>	  
 	<script>
 		function concat(src){
-			convert_wrap.innerHTML =convert_wrap.innerHTML + '<li><img src="'+src+'"/></li>';	
+			convert_wrap.innerHTML =convert_wrap.innerHTML + '<li><img src="'+src+'" style="width:260px;height:auto;"/></li>';	
 		}
 		var convert_wrap = document.getElementById("convert-wrap");
 		var src_img_wrap = new Image();
 		src_img_wrap.onload = function(){
-			document.getElementById("src-img-wrap").innerHTML = '<img src="'+src_img_wrap.src+'"/>';
+			document.getElementById("src-img-wrap").innerHTML = '<img src="'+src_img_wrap.src+'" style="width:260px;height:auto;"/>';
 			var convertImage = new ConvertImage({
 				image: src_img_wrap,
 				width: src_img_wrap.width,
@@ -47,6 +47,8 @@
 			concat(base64blackwhite);	
 			var base64relif = convertImage.getRelief(1);
 			concat(base64relif);
+			var base64sharpen = convertImage.getGsharpen([0,1,0,1,-4,1,0,1,0],0.3);
+			concat(base64sharpen);
 		}
 		src_img_wrap.src = "image.jpg";
 	</script>
