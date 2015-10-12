@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title></title>
+		<style>
+			ul,li,body{
+				padding: 0;
+				margin: 0;
+			}
+			body {
+				padding: 10px;
+			}
+			ul,li {
+				list-style: none;
+				display: block;
+			}
+			#convert-wrap {
+			}
+			#convert-wrap li {
+				float: left;
+				margin-right: 10px;
+			}
+		</style>
+	</head>
+<body>
+	<div id="src-img-wrap"></div>
+	<ul id="convert-wrap">
+
+	</ul>
+	<script	type="text/javascript" src="convertImage.js?v=2015"></script>	  
+	<script>
+		function concat(src){
+			convert_wrap.innerHTML =convert_wrap.innerHTML + '<li><img src="'+src+'"/></li>';	
+		}
+		var convert_wrap = document.getElementById("convert-wrap");
+		var src_img_wrap = new Image();
+		src_img_wrap.onload = function(){
+			document.getElementById("src-img-wrap").innerHTML = '<img src="'+src_img_wrap.src+'"/>';
+			var convertImage = new ConvertImage({
+				image: src_img_wrap,
+				width: src_img_wrap.width,
+				height: src_img_wrap.height
+			});
+			var base64nevative = convertImage.getNevatives();
+			concat(base64nevative);
+			var base64blackwhite = convertImage.getBlackWhite();
+			concat(base64blackwhite);	
+			var base64relif = convertImage.getRelief(1);
+			concat(base64relif);
+		}
+		src_img_wrap.src = "image.jpg";
+	</script>
+</body>
+</html>
+
