@@ -49,6 +49,12 @@
 			concat(base64relif);
 			var base64sharpen = convertImage.getGsharpen([0,1,0,1,-4,1,0,1,0],0.3);
 			concat(base64sharpen);
+			var base64gaussblur = convertImage.getGaussBlur(1.5,1);
+			concat(base64gaussblur);
+			var base64stackblur = convertImage.getStackBlur(12);
+			concat(base64stackblur);
+			var base64lighting = convertImage.getLighting(100,80,100,140);
+			concat(base64lighting);
 		}
 		src_img_wrap.src = "image.jpg";
 	</script>
