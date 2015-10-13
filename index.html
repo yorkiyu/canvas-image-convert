@@ -41,13 +41,13 @@
 				width: src_img_wrap.width,
 				height: src_img_wrap.height
 			});
-			var base64nevative = convertImage.getNevatives();
+			var base64nevative = convertImage.getNegatives();
 			concat(base64nevative);
 			var base64blackwhite = convertImage.getBlackWhite();
 			concat(base64blackwhite);	
 			var base64relif = convertImage.getRelief(1);
 			concat(base64relif);
-			var base64sharpen = convertImage.getGsharpen([0,1,0,1,-4,1,0,1,0],0.3);
+			var base64sharpen = convertImage.getSharpen([0,1,0,1,-4,1,0,1,0],0.3);
 			concat(base64sharpen);
 			var base64gaussblur = convertImage.getGaussBlur(1.5,1);
 			concat(base64gaussblur);

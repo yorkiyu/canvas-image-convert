@@ -83,11 +83,11 @@ ConvertImage.prototype.setRGBA = function(x,y,pixel,pixels){
 	return this;
 }
 /*
-	nevatives 底片
+	negatives 底片
 	算法原理：将当前像素点的RGB值分别与255之差后的值作为当前点的RGB值，即
 	R = 255 – R；G = 255 – G；B = 255 – B；
 */
-ConvertImage.prototype.getNevatives = function(){
+ConvertImage.prototype.getNegatives = function(){
 	this.drawImage();
 	var imageData = this.ctx.getImageData(0,0,this.opts.width,this.opts.height);
 	var pixels = imageData.data;
@@ -209,7 +209,7 @@ ConvertImage.prototype.getRelief = function(radius){
 	 @params ratio is c in up 
 ***/
 
-ConvertImage.prototype.getGsharpen = function(laplacian,ratio,radius){
+ConvertImage.prototype.getSharpen = function(laplacian,ratio,radius){
 	laplacian = laplacian || [-1,-1,-1,-1,9,-1,-1,-1,-1];
 	radius = radius || 1;
 	ratio = ratio || 0.5;
